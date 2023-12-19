@@ -15,19 +15,7 @@ const UserAccess = () => {
         email: "",
         password: "",
     });
-    // useEffect(() => {
-    //     const auth = getAuth(app)
-    //     onAuthStateChanged(auth, (user) => {
-    //         if (user) {
-    //             // User is signed in, see docs for a list of available properties
-    //             // https://firebase.google.com/docs/reference/js/auth.user
-    //             dispatch(isUser(user))
-    //             // ...
-    //         } else {
-    //             dispatch(isUser(null))
-    //         }
-    //     })
-    // }, [dispatch])
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
@@ -36,7 +24,7 @@ const UserAccess = () => {
             [name]: value,
         });
     };
-
+console.log(authFormData)
     const authFormSubmit = (e) => {
         e.preventDefault();
 
@@ -49,9 +37,7 @@ const UserAccess = () => {
         }
 
     };
-    // const submitUserHandler = () => {
-    //     dispatch(isUser())
-    // }
+
     const dataInputs = [
         {
             type: "text",

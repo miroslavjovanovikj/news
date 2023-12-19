@@ -47,7 +47,6 @@ const Admin = () => {
 
     const logOutHandler = () => {
         dispatch(logOutUser())
-        console.log('logout')
     }
 
     let border
