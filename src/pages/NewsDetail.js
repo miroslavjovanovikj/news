@@ -1,61 +1,110 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RiEditLine } from "react-icons/ri";
-import { RiDeleteBin2Line } from "react-icons/ri";
-import useFetch from "../hooks/useFetch";
-import { deleteNews, fetchNews } from "../store";
-import Button from "../UI/Button";
 
+import useFetch from "../hooks/useFetch";
+import { deleteNews } from "../store";
+import Button from "../UI/Button";
+import NewsDetailItem from "../components/NewsDetailItem";
+import FormBody from "../UI/FormBody";
+import { INPUT_DATA } from "../static/inputData";
+import NewsDetailsButtons from "../components/NewsDetailsButtons";
+import { editNews,editUpdate } from "../store";
 const NewsDetail = () => {
   const params = useParams();
   const { category, id } = params;
   const { data } = useFetch(category, id);
+  const selectedItem = data.find((item) => item.id === id);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userName = useSelector((state) => state.login.user);
+  const border = "border border-solid border-neutral-300 rounded";
+  const buttonStyle = "p-3 text-white";
 
+
+  const { title, file, text } = INPUT_DATA;
+
+  const [edit, setEdit] = useState(false);
+  const [item, setItem] = useState({
+    title: selectedItem?.title,
+    file: selectedItem?.photo,
+    text: selectedItem?.text,
+    id:selectedItem?.id
+  });
   const postDeleteHandler = () => {
-    console.log("test", id);
-    dispatch(fetchNews(category));
     dispatch(deleteNews({ id, category: category }));
     navigate(`/${category}`);
   };
-  const editPostHandler=()=>{
-    console.log('edit')
+  const editPostHandler = () => {
+    setEdit(true);
+  };
+  const cancelEditHandler = () => {
+    setEdit(false);
+  };
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setItem({
+      ...item,
+      [name]: value,
+    });
+  };
+  const onEditSubmit = (e)=>{
+    e.preventDefault()
+    dispatch(editNews({...item, category}))
+    dispatch(editUpdate({...item, category}))
+    setEdit(false)
   }
-  const selectedItem = data.find((item) => item.id === id);
-  console.log(selectedItem);
+  const dataInputs = [
+    {
+      ...title,
+      onChange: handleInputChange,
+      value: item.title,
+    },
+    {
+      ...file,
+      onChange: handleInputChange,
+      value: item?.photo,
+    },
+    {
+      ...text,
+      onChange: handleInputChange,
+      value: item.text,
+    },
+  ];
   return (
     <div>
       {userName && (
-        <div>
-          <div className="flex justify-end items-center w-2/4 mx-auto max-w-xl space-x-4">
-            <div className="h-4">
-              <Button onClick={postDeleteHandler} className="text-rose-600">
-                <RiDeleteBin2Line size={29}/>
-              </Button>
-            </div>
-
-            <div className="h-4">
-              <Button><RiEditLine onClick={editPostHandler} size={29} color="blue"/></Button>
-            </div>
-          </div>
-          <hr className="my-4 w-full border-t border-gray-300 w-2/6 mx-auto" />
-        </div>
-      )}
-
-      <div className="flex flex-col items-center w-2/4 mx-auto mt-4 max-w-xl">
-        <div className="mb-2 text-2xl font-bold">
-          {selectedItem?.title.toUpperCase()}
-        </div>
-        <img
-          alt="some o"
-          className="max-w-xl pt-6 pb-6"
-          src="https://cdn.britannica.com/78/249578-050-01D46C9B/Novak-Djokovic-Serbia-US-Open-2023.jpg"
+        <NewsDetailsButtons
+          postDeleteHandler={postDeleteHandler}
+          editPostHandler={editPostHandler}
         />
-        <div>{selectedItem?.text}</div>
-      </div>
+      )}
+      {edit && (
+        <form
+        onSubmit={onEditSubmit}
+          className={`mt-10 flex-col items-center w-1/3 mx-auto mt-4 ${border}`}
+        >
+          <FormBody data={dataInputs} />
+          <div className="text-right pr-6 pb-3 ">
+            <Button
+              className={`bg-red-700 ${buttonStyle} ${border}`}
+              onClick={cancelEditHandler}
+            >
+              Cancel
+            </Button>
+            <Button
+              className={`bg-sky-900 ${buttonStyle} ${border}`}
+              type="submit"
+            >
+              Save
+            </Button>
+          </div>
+        </form>
+      )}
+      {!edit && <NewsDetailItem selectedItem={selectedItem} />}
     </div>
   );
 };
