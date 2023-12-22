@@ -10,10 +10,20 @@ const fetchSlice = createSlice({
     },
     reducers: {
         deleteUpdate(state, action) {
-           
             state.data = state.data.filter((item) => item.id !== action.payload)
-            console.log(state.data, 'od recucerot')
         },
+        editUpdate(state, action){
+            console.log(action.payload)
+            state.data = state.data.map((item)=>{
+                if(item.id===action.payload.id){
+                   return {
+                        ...item,
+                        ...action.payload
+                    }
+                }
+                return item
+            })
+        }
     },
     extraReducers(builder) {
         builder.addCase(fetchNews.pending, (state, action) => {
@@ -27,7 +37,7 @@ const fetchSlice = createSlice({
                 allData.push({
                     id: key,
                     title: data[key].title,
-                    text: data[key].textArea,
+                    text: data[key].text,
                     photo: data[key].file,
                 });
             }
@@ -40,4 +50,4 @@ const fetchSlice = createSlice({
     },
 });
 export const newsReducer = fetchSlice.reducer
-export const { deleteUpdate } = fetchSlice.actions
+export const { deleteUpdate, editUpdate } = fetchSlice.actions

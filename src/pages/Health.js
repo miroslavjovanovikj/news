@@ -1,12 +1,19 @@
 
 import { useLocation } from 'react-router-dom'
 import useFetch from "../hooks/useFetch";
-import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux';
+import {useEffect} from 'react';
+import { fetchNews } from '../store';
 const Health = () => {
-    const user = useSelector(state => state.login.user)
-    console.log(user)
+
+   const dispatch = useDispatch()
     const location = useLocation();
     const currentRouteName = location.pathname.split('/').pop();
+    
+    useEffect(() => {
+        dispatch(fetchNews(currentRouteName))
+    }, [dispatch, currentRouteName,]);
+
     const { newsList } = useFetch(currentRouteName)
     return <div >{newsList} </div>
 }
