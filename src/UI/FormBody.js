@@ -1,18 +1,15 @@
 import Input from "./Input";
-import Button from "./Button";
 const FormBody = ({ data }) => {
     const formData = data.map((input) => (
-        <Input
-            name={input.name}
-            elementType={input.elementType}
-            onChange={input.onChange}
+       <div >
+             <Input
+            {...input}
+            inputMargin='m-5'
         />
+       </div>
     ));
-    return (
-        <div>
-            {formData}
-
-        </div>
-    );
+    return  formData
+   
+   
 };
 export default FormBody;

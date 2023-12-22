@@ -1,54 +1,55 @@
 import { useState } from "react";
 import { useDispatch } from 'react-redux'
-import Input from "../UI/Input";
 import Button from "../UI/Button";
 import { createNews, logOutUser, } from "../store";
 import { Link } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import { useParams, useNavigate } from "react-router-dom";
-const DATA = [
-    { value: "sport", label: "sport" },
-    { value: "viral", label: "viral" },
-    { value: "health", label: "health" },
-];
+import { useNavigate } from "react-router-dom";
+import FormBody from "../UI/FormBody";
+import {INPUT_DATA} from '../static/inputData'
+
 const buttonStyle = 'bg-sky-900 p-3 text-white border-solid border-neutral-300 rounded'
 const Admin = () => {
 
     const dispatch = useDispatch()
-
-    const [title, setTitle] = useState("");
-    const [textArea, setTextArea] = useState("");
-
-    const [file, setFile] = useState("");
-    const [selectedOption, setSelectedOption] = useState("");
-    const [validation, setValidation] = useState(false)
-
-    const inputsHandler = (state, e) => {
-        state(e.target.value);
-    };
-    const location = useLocation();
-    const currentRouteName = location.pathname.split('/').pop();
-    console.log(currentRouteName)
     const navigate = useNavigate();
+
+    const {title, file, text, type }=INPUT_DATA;
+
+    const [validation, setValidation] = useState(false)
+    const [createFormData, setCreateFormData] = useState({
+        select:"",
+        title:"",
+        file:"",
+        text:''
+
+    })
+
+    const handleInputChange = (e)=>{
+        const {name, value} = e.target
+        console.log(`Setting ${name} to ${value}`);
+        setCreateFormData({
+            ...createFormData,
+            [name]:value
+        })
+    }
+  
+    const logOutHandler = () => {
+        dispatch(logOutUser())
+    }
+
     const newsSubmitHanler = (e) => {
         e.preventDefault();
-        if (!title.trim() || !textArea.trim() || !file || !selectedOption.trim()) {
+        const {title, text, file, select} = createFormData
+        if (!title.trim() || !text.trim() || !file.trim() || !select ) {
             setValidation(true)
             return
         }
         setValidation(false)
-        const data = { title, textArea, file, selectedOption }
-        dispatch(createNews(data));
-        navigate(`/sport`);
-        setTitle("");
-        setFile("");
-        setTextArea("");
+        dispatch(createNews(createFormData));
+        navigate(`/${select}`);
     };
 
-    const logOutHandler = () => {
-        dispatch(logOutUser())
-        console.log('logout')
-    }
+
 
     let border
     if (validation) {
@@ -56,7 +57,25 @@ const Admin = () => {
     } else {
         border = 'border border-solid border-neutral-300 rounded '
     }
-
+    const dataInputs = [
+        {
+           ...type,
+            onChange: handleInputChange,
+        },        
+        {
+           ...title,
+            onChange:handleInputChange
+        },
+        {
+           ...file,
+            onChange: handleInputChange,
+        },
+        
+        {
+            ...text,
+            onChange:handleInputChange
+        }
+    ]
     return (
         <div>
             <div>
@@ -67,39 +86,8 @@ const Admin = () => {
                 {validation && <p>All filds are required</p>}
                 <div className={`w-1/3 mx-auto mt-14 ${border}`}>
                     <div className="text-center mt-3">Create Post</div>
-                    <div className="p-4">
-                        <Input
-                            elementType="select"
-                            onChange={(e) => inputsHandler(setSelectedOption, e)}
-                            data={DATA}
-                        />
-                    </div>
-                    <div className="p-4 mt-5">
-                        <Input
-                            name="text"
-                            elementType="input"
-                            onChange={(e) => inputsHandler(setTitle, e)}
-                            placeholder="Title"
-                            value={title}
-                        />
-                    </div>
-                    <div className="p-4">
-                        <Input
-                            name="file"
-                            elementType="input"
-                            onChange={(e) => inputsHandler(setFile, e)}
-                        />
-                    </div>
-                    <div className="p-4">
-                        <Input
-                            elementType="text-area"
-                            value={textArea}
-                            onChange={(e) => inputsHandler(setTextArea, e)}
-                            placeholder="Text"
-                        />
-                    </div>
-
-                    <div className="text-right pr-4 pb-3 ">
+                    <FormBody data={dataInputs}/>
+                    <div className="text-right pr-6 pb-3 ">
                         <Button className={buttonStyle} type="submit">Create</Button>
                     </div>
                 </div>
