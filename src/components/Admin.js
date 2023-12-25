@@ -16,14 +16,17 @@ const Admin = () => {
     const {title, file, text, type }=INPUT_DATA;
 
     const [validation, setValidation] = useState(false)
+    const [eFile, setEFile] = useState()
     const [createFormData, setCreateFormData] = useState({
         select:"",
         title:"",
-        file:"",
+    
         text:''
 
     })
-
+    const onSetFileHandler = (e)=>{
+        setEFile(e.target.files[0])
+    }
     const handleInputChange = (e)=>{
         const {name, value} = e.target
         console.log(`Setting ${name} to ${value}`);
@@ -40,12 +43,12 @@ const Admin = () => {
     const newsSubmitHanler = (e) => {
         e.preventDefault();
         const {title, text, file, select} = createFormData
-        if (!title.trim() || !text.trim() || !file.trim() || !select ) {
+        if (!title.trim() || !text.trim() || !eFile || !select ) {
             setValidation(true)
             return
         }
         setValidation(false)
-        dispatch(createNews(createFormData));
+        dispatch(createNews({...createFormData, file:eFile}));
         navigate(`/${select}`);
     };
 
@@ -68,7 +71,7 @@ const Admin = () => {
         },
         {
            ...file,
-            onChange: handleInputChange,
+            onChange: onSetFileHandler,
         },
         
         {
