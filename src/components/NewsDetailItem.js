@@ -7,7 +7,7 @@ const NewsDetailItem =({selectedItem})=>{
         <img
           alt="some o"
           className="max-w-xl pt-6 pb-6"
-          src="https://cdn.britannica.com/78/249578-050-01D46C9B/Novak-Djokovic-Serbia-US-Open-2023.jpg"
+          src={selectedItem?.photo}
         />
         <div>{selectedItem?.text}</div>
       </div>
